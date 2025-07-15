@@ -23,7 +23,16 @@ class NN:
 
         return z
     
-    def softmax(self, z: np.array) -> np.array:
+    def softmax_calc(self, z: np.array) -> np.array:
+        """
+        Function to do softmax calculation
+
+        Args:
+            z (np.array): Logit
+
+        Returns:
+            a (np.array): 
+        """
         ez = np.exp(z)
 
         a = ez/np.sum(ez)
@@ -55,9 +64,32 @@ class NN:
             float: 
         """
         return np.maximum(0,z)
+    
+    def _activation(self, z: np.array, type: str) -> np.array:
+        """
+        Function to apply a activation method
 
-    def dense(self, A_in: np.array, W: np.array, b: np.array) -> np.array:
-        # TODO: Add activation option
+        Args:
+            z (np.array): Logit
+            type (str): Type of activation function to be used.
+
+        Raises:
+            ValueError: Raised if invalid activation function type inputed.
+
+        Returns:
+            np.array: Activation result
+        """
+
+        if type == "softmax":
+            return self.softmax_calc(z=z)
+        elif type == "relu":
+            return self.relu_calc(z=z)
+        elif type == "sigmoid":
+            return self.sigmoid_calc(z=z)
+        else:
+            raise ValueError("Invalid activation function inputed. Supported function: ['softmax', 'relu', 'sigmoid']")
+    
+    def dense(self, A_in: np.array, W: np.array, b: np.array, type: str) -> np.array:
         """
         NN layer used to 
 
@@ -69,13 +101,13 @@ class NN:
         Returns:
             A_out(np.array): _description_
         """
-        A_out_logit = np.matmul(A_in, W) + b
+        Z = np.matmul(A_in, W) + b
 
-        A_out = self.sigmoid_calc(A_out_logit)
+        A_out = self._activation(Z)
 
-        return A_out
+        return A_out, Z
 
-    def sequential(self, X: np.array, weights: list[np.array], biases: np.array) -> np.array:
+    def sequential(self, X: np.array, weights: list[np.array], biases: np.array, activations: list[str]) -> np.array:
         """
         Sequential func used to calculate the propability
 
@@ -83,22 +115,21 @@ class NN:
             X (np.array): Input vector
             weights (list[np.array]): List of weights
             biases (np.array): Vector of biases.
+            activations (list[str]): List of activation types
 
         Returns:
             a_out(np.array): Prob value of a_out
         """
-        units = weights.shape[0]
+        A = X
+        A_s = [A]
+        Z_s = []
 
-        for j in range(units):
+        for i in range(len(weights)):
+            A, Z = self.dense(A, weights[i], biases[i], type=activations[i])
+            A_s.append(A)
+            Z_s.append(Z)
 
-            if j == 0:
-                a_j = self.dense(X, weights[0], biases[0])
-            else:
-                a_j = self.dense(a_j, weights[j], biases[j])
-        
-        a_out = a_j
-
-        return a_out
+        return A_s, Z_s 
         
 if __name__ == "__main__":
     ...
