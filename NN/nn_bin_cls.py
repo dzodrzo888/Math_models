@@ -1,11 +1,34 @@
 import numpy as np
 
-class BinaryNN:
+class NN:
     """
     This class is used to create a simple binary classification neural network.
     """
     def __init__(self):
         ...
+
+    def compute_predictions(self, X: np.array, w: float, b: float) -> np.array:
+        """
+        Calculates predictions.
+
+        Args:
+            x (np.array): Input values.
+            w (float): Weights.
+            b (float): Bias.
+
+        Returns:
+            z(np.array): Prediction
+        """
+        z = np.dot(X, w) + b
+
+        return z
+    
+    def softmax(self, z: np.array) -> np.array:
+        ez = np.exp(z)
+
+        a = ez/np.sum(ez)
+
+        return a
 
     def sigmoid_calc(self, z: np.array) -> np.array:
         """
