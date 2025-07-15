@@ -4,8 +4,9 @@ class NN:
     """
     This class is used to create a simple binary classification neural network.
     """
-    def __init__(self):
-        ...
+    def __init__(self, learning_rate, epochs):
+        self.learning_rate = learning_rate
+        self.epochs = epochs
 
     def compute_predictions(self, X: np.array, w: float, b: float) -> np.array:
         """
@@ -53,7 +54,7 @@ class NN:
 
         return a
     
-    def relu_calc(self, z: np.array) -> float:
+    def relu_calc(self, z: np.array) -> np.array:
         """
         Relu activation calculation
 
@@ -65,31 +66,53 @@ class NN:
         """
         return np.maximum(0,z)
     
-    def _activation(self, z: np.array, type: str) -> np.array:
+    def _activation(self, z: np.array, kind: str) -> np.array:
         """
         Function to apply a activation method
 
         Args:
             z (np.array): Logit
-            type (str): Type of activation function to be used.
+            kind (str): kind of activation function to be used.
 
         Raises:
-            ValueError: Raised if invalid activation function type inputed.
+            ValueError: Raised if invalid activation function kind inputed.
 
         Returns:
             np.array: Activation result
         """
 
-        if type == "softmax":
+        if kind == "softmax":
             return self.softmax_calc(z=z)
-        elif type == "relu":
+        elif kind == "relu":
             return self.relu_calc(z=z)
-        elif type == "sigmoid":
+        elif kind == "sigmoid":
             return self.sigmoid_calc(z=z)
         else:
             raise ValueError("Invalid activation function inputed. Supported function: ['softmax', 'relu', 'sigmoid']")
+        
+    def _activation_derivative(self, a, kind: str):
+        """
+        Calculates the derivatives of the activation function
+
+        Args:
+            a (float): Activation function result
+            kind (str): Type of activation function
+
+        Raises:
+            ValueError: Raised if invalid activation function kind inputed.
+
+        Returns:
+            float/int: Derivative of the activation
+        """
+        if kind == "sigmoid":
+            return a * (1 - a)
+        elif kind == "relu":
+            return np.where(a > 0, 1, 0)
+        else:
+            raise ValueError("Invalid activation function inputed. Supported function: ['relu', 'sigmoid']")
+        
     
-    def dense(self, A_in: np.array, W: np.array, b: np.array, type: str) -> np.array:
+    def dense(self, A_in: np.array, W: np.array, b: np.array, kind: str) -> np.array:
         """
         NN layer used to 
 
@@ -103,7 +126,7 @@ class NN:
         """
         Z = np.matmul(A_in, W) + b
 
-        A_out = self._activation(Z)
+        A_out = self._activation(Z, kind=kind)
 
         return A_out, Z
 
@@ -115,7 +138,7 @@ class NN:
             X (np.array): Input vector
             weights (list[np.array]): List of weights
             biases (np.array): Vector of biases.
-            activations (list[str]): List of activation types
+            activations (list[str]): List of activation kinds
 
         Returns:
             a_out(np.array): Prob value of a_out
@@ -125,7 +148,7 @@ class NN:
         Z_s = []
 
         for i in range(len(weights)):
-            A, Z = self.dense(A, weights[i], biases[i], type=activations[i])
+            A, Z = self.dense(A, weights[i], biases[i], kind=activations[i])
             A_s.append(A)
             Z_s.append(Z)
 
@@ -164,13 +187,29 @@ class NN:
 
         return bin_loss_mean
 
-    def _compute_loss(self, y_true, y_pred, type: str):
-        if type == "mean_squared_error":
+    def _compute_loss(self, y_true, y_pred, kind: str):
+        if kind == "mean_squared_error":
             return self._MSE_calc(y_true=y_true, y_pred=y_pred)
-        elif type == "binary_crossentropy":
+        elif kind == "binary_crossentropy":
             return self._binary_crossentropy_calc(y_true=y_true, y_pred=y_pred)
         else:
             raise ValueError("Invalid loss function inputed. Supported function: ['mean_squared_error', 'binary_crossentropy']")
-        
+    
+    def _backward(self, activations, zs, y_true, loss="binary_crossentropy"):
+        ...
+
+    def _update_parameters(self, grads_w, grads_b):
+        ...
+    
+    def fit(X, y, epochs=100, loss="binary_crossentropy"):
+        ...
+    
+    def predict(X, threshold=0.5):
+        ...
+
+    def predict_proba(X):
+        ...
+
+
 if __name__ == "__main__":
     ...
