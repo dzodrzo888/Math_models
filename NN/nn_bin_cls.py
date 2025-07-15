@@ -20,8 +20,21 @@ class BinaryNN:
         a = 1/(1 + np.exp(-z))
 
         return a
+    
+    def relu_calc(self, z: np.array) -> float:
+        """
+        Relu activation calculation
+
+        Args:
+            z (np.array): Logit
+
+        Returns:
+            float: 
+        """
+        return np.maximum(0,z)
 
     def dense(self, A_in: np.array, W: np.array, b: np.array) -> np.array:
+        # TODO: Add activation option
         """
         NN layer used to 
 
