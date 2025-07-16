@@ -2,11 +2,12 @@ import numpy as np
 
 class NN:
     """
-    This class is used to create a simple binary classification neural network.
+    This class is used to create a simple neural network.
     """
     def __init__(self, learning_rate, epochs):
         self.learning_rate = learning_rate
         self.epochs = epochs
+
         self.weights = []
         self.biases = []
 
@@ -126,48 +127,7 @@ class NN:
         """
         mse = np.mean(np.square(y_true - y_pred))
         return mse
-
-    def _MSE_calc(self, y_true: np.array, y_pred: np.array) -> float:
-        """
-        Calculates mean squared error
-
-        Args:
-            y_true (np.array): Y true value
-            y_pred (np.array): Y predicted value
-
-        Returns:
-            mse (float): Mean squared error
-        """
-        mse = np.mean(np.square(y_true - y_pred))
-        return mse
     
-    def _binary_crossentropy_calc(self, y_true: np.array, y_pred: np.array) -> float:
-        """
-        Calculates binary crossentropy
-
-        Args:
-            y_true (np.array): Y true value.
-            y_pred (np.array): Y predicted value.
-
-        Returns:
-            bin_loss_mean (float): Binary crossentropy loss value.
-        """
-        epsilon = 1e-15
-        y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
-        bin_loss = y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred)
-
-        bin_loss_mean = -np.mean(bin_loss)
-
-        return bin_loss_mean
-
-    def _compute_loss(self, y_true, y_pred, kind: str):
-        if kind == "mean_squared_error":
-            return self._MSE_calc(y_true=y_true, y_pred=y_pred)
-        elif kind == "binary_crossentropy":
-            return self._binary_crossentropy_calc(y_true=y_true, y_pred=y_pred)
-        else:
-            raise ValueError("Invalid loss function inputed. Supported function: ['mean_squared_error', 'binary_crossentropy']")
-
     def _binary_crossentropy_calc(self, y_true: np.array, y_pred: np.array) -> float:
         """
         Calculates binary crossentropy
@@ -210,7 +170,7 @@ class NN:
             raise ValueError("Invalid loss function inputed. Supported function: ['mean_squared_error', 'binary_crossentropy']")
         
     
-    def dense(self, A_in: np.array, W: np.array, b: np.array, kind: str) -> np.array:
+    def _dense(self, A_in: np.array, W: np.array, b: np.array, kind: str) -> np.array:
         """
         NN layer used to 
 
@@ -245,12 +205,12 @@ class NN:
         Z_s = []
 
         for i in range(len(self.weights)):
-            A, Z = self.dense(A, self.weights[i], self.biases[i], kind=activations[i])
+            A, Z = self._dense(A, self.weights[i], self.biases[i], kind=activations[i])
             A_s.append(A)
             Z_s.append(Z)
 
         return A_s, Z_s 
-    
+
     def _backward(self, A_s: np.array, Z_s: np.array, y_true: np.array, activations: list[str]):
         """
         Function used to compute gradients using the backward propagation
@@ -281,7 +241,7 @@ class NN:
 
             if i > 0:
 
-                d_activation = self._activation_derivative(Z_s[i - 1], kind=activations[i - 1])
+                d_activation = self._activation_derivative(A_s[i], kind=activations[i])
                 delta = np.dot(delta, self.weights[i].T) * d_activation
 
         return grads_w, grads_b
@@ -297,10 +257,40 @@ class NN:
         for i in range(len(self.weights)):
             self.weights[i] -= self.learning_rate * grads_w[i]
             self.biases[i] -= self.learning_rate * grads_b[i]
-    
-    def fit(X, y, epochs=100, loss="binary_crossentropy"):
-        ...
-    
+
+    def fit(self, X: np.array, y: np.array, hidden_layers=[5], activations=["relu", "sigmoid"], loss="binary_crossentropy"):
+        """
+        Fit the neural network model.
+
+        Args:
+            X (np.array): Input features.
+            y (np.array): Target labels.
+            hidden_layers (list[int]): Number of units in each hidden layer.
+            activations (list[str]): Activation function per layer.
+            loss (str): Loss function to use.
+        """
+        np.random.seed(42)
+        input_dim = X.shape[1]
+        layer_dims = [input_dim] + hidden_layers + [1]
+
+        self.weights = []
+        self.biases = []
+
+        for i in range(len(layer_dims) - 1):
+            w = np.random.randn(layer_dims[i], layer_dims[i + 1]) * 0.01
+            b = np.zeros((1, layer_dims[i + 1]))
+            self.weights.append(w)
+            self.biases.append(b)
+
+        for epoch in range(self.epochs):
+            A_s, Z_s = self._forward_prop(X, activations)
+            loss_val = self._compute_loss(y, A_s[-1], kind=loss)
+            grads_w, grads_b = self._backward(A_s, Z_s, y, activations)
+            self._update_parameters(grads_w, grads_b)
+
+            if (epoch + 1) % 10 == 0 or epoch == 0:
+                print(f"Epoch {epoch + 1}/{self.epochs} | Loss: {loss_val:.4f}")
+
     def predict(X, threshold=0.5):
         ...
 
@@ -308,4 +298,8 @@ class NN:
         ...
 
 if __name__ == "__main__":
-    ...
+    X = np.random.randn(100, 2)
+    y = (np.random.rand(100, 1) > 0.5).astype(float)
+
+    model = NN(learning_rate=0.001, epochs=100)
+    model.fit(X, y, hidden_layers=[4], activations=["relu", "sigmoid"], loss="binary_crossentropy")
