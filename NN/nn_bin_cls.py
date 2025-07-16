@@ -111,6 +111,47 @@ class NN:
         else:
             raise ValueError("Invalid activation function inputed. Supported function: ['relu', 'sigmoid']")
         
+    def _MSE_calc(self, y_true: np.array, y_pred: np.array) -> float:
+        """
+        Calculates mean squared error
+
+        Args:
+            y_true (np.array): Y true value
+            y_pred (np.array): Y predicted value
+
+        Returns:
+            mse (float): Mean squared error
+        """
+        mse = np.mean(np.square(y_true - y_pred))
+        return mse
+    
+    def _binary_crossentropy_calc(self, y_true: np.array, y_pred: np.array) -> float:
+        """
+        Calculates binary crossentropy
+
+        Args:
+            y_true (np.array): Y true value.
+            y_pred (np.array): Y predicted value.
+
+        Returns:
+            bin_loss_mean (float): Binary crossentropy loss value.
+        """
+        epsilon = 1e-15
+        y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+        bin_loss = y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred)
+
+        bin_loss_mean = -np.mean(bin_loss)
+
+        return bin_loss_mean
+
+    def _compute_loss(self, y_true, y_pred, kind: str):
+        if kind == "mean_squared_error":
+            return self._MSE_calc(y_true=y_true, y_pred=y_pred)
+        elif kind == "binary_crossentropy":
+            return self._binary_crossentropy_calc(y_true=y_true, y_pred=y_pred)
+        else:
+            raise ValueError("Invalid loss function inputed. Supported function: ['mean_squared_error', 'binary_crossentropy']")
+        
     
     def dense(self, A_in: np.array, W: np.array, b: np.array, kind: str) -> np.array:
         """
@@ -154,47 +195,6 @@ class NN:
 
         return A_s, Z_s 
     
-    def _MSE_calc(self, y_true: np.array, y_pred: np.array) -> float:
-        """
-        Calculates mean squared error
-
-        Args:
-            y_true (np.array): Y true value
-            y_pred (np.array): Y predicted value
-
-        Returns:
-            mse (float): Mean squared error
-        """
-        mse = np.mean(np.square(y_true - y_pred))
-        return mse
-    
-    def _binary_crossentropy_calc(self, y_true: np.array, y_pred: np.array) -> float:
-        """
-        Calculates binary crossentropy
-
-        Args:
-            y_true (np.array): Y true value.
-            y_pred (np.array): Y predicted value.
-
-        Returns:
-            bin_loss_mean (float): Binary crossentropy loss value.
-        """
-        epsilon = 1e-15
-        y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
-        bin_loss = y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred)
-
-        bin_loss_mean = -np.mean(bin_loss)
-
-        return bin_loss_mean
-
-    def _compute_loss(self, y_true, y_pred, kind: str):
-        if kind == "mean_squared_error":
-            return self._MSE_calc(y_true=y_true, y_pred=y_pred)
-        elif kind == "binary_crossentropy":
-            return self._binary_crossentropy_calc(y_true=y_true, y_pred=y_pred)
-        else:
-            raise ValueError("Invalid loss function inputed. Supported function: ['mean_squared_error', 'binary_crossentropy']")
-    
     def _backward(self, activations, zs, y_true, loss="binary_crossentropy"):
         ...
 
@@ -209,7 +209,6 @@ class NN:
 
     def predict_proba(X):
         ...
-
 
 if __name__ == "__main__":
     ...
