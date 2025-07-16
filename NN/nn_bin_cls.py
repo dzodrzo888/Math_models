@@ -7,6 +7,8 @@ class NN:
     def __init__(self, learning_rate, epochs):
         self.learning_rate = learning_rate
         self.epochs = epochs
+        self.weights = []
+        self.biases = []
 
     def compute_predictions(self, X: np.array, w: float, b: float) -> np.array:
         """
@@ -124,7 +126,46 @@ class NN:
         """
         mse = np.mean(np.square(y_true - y_pred))
         return mse
+    def _MSE_calc(self, y_true: np.array, y_pred: np.array) -> float:
+        """
+        Calculates mean squared error
+
+        Args:
+            y_true (np.array): Y true value
+            y_pred (np.array): Y predicted value
+
+        Returns:
+            mse (float): Mean squared error
+        """
+        mse = np.mean(np.square(y_true - y_pred))
+        return mse
     
+    def _binary_crossentropy_calc(self, y_true: np.array, y_pred: np.array) -> float:
+        """
+        Calculates binary crossentropy
+
+        Args:
+            y_true (np.array): Y true value.
+            y_pred (np.array): Y predicted value.
+
+        Returns:
+            bin_loss_mean (float): Binary crossentropy loss value.
+        """
+        epsilon = 1e-15
+        y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+        bin_loss = y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred)
+
+        bin_loss_mean = -np.mean(bin_loss)
+
+        return bin_loss_mean
+
+    def _compute_loss(self, y_true, y_pred, kind: str):
+        if kind == "mean_squared_error":
+            return self._MSE_calc(y_true=y_true, y_pred=y_pred)
+        elif kind == "binary_crossentropy":
+            return self._binary_crossentropy_calc(y_true=y_true, y_pred=y_pred)
+        else:
+            raise ValueError("Invalid loss function inputed. Supported function: ['mean_squared_error', 'binary_crossentropy']")
     def _binary_crossentropy_calc(self, y_true: np.array, y_pred: np.array) -> float:
         """
         Calculates binary crossentropy
@@ -182,7 +223,8 @@ class NN:
             activations (list[str]): List of activation kinds
 
         Returns:
-            a_out(np.array): Prob value of a_out
+            A_s(np.array): Activations results
+            Z_s
         """
         A = X
         A_s = [A]
@@ -195,11 +237,32 @@ class NN:
 
         return A_s, Z_s 
     
-    def _backward(self, activations, zs, y_true, loss="binary_crossentropy"):
-        ...
+    def _backward(self, A_s: list, Z_s: list, y_true: np.array, activations: list[str]):
+        grads_w = []
+        grads_b = []
 
-    def _update_parameters(self, grads_w, grads_b):
-        ...
+        A_last = A_s[-1]
+        delta = A_last - y_true 
+
+        for i in reversed(range(len(self.weights))):
+
+            dw = np.dot(A_s[i].T, delta)
+            db = np.sum(delta, axis=0, keepdims=True)
+
+            grads_w.insert(0, dw)
+            grads_b.insert(0, db)
+
+            if i > 0:
+
+                d_activation = self._activation_derivative(Z_s[i - 1], kind=activations[i - 1])
+                delta = np.dot(delta, self.weights[i].T) * d_activation
+
+        return grads_w, grads_b
+
+    def _update_parameters(self, grads_w: np.array, grads_b: np.array):
+        for i in range(self.weights):
+            self.weights[i] -= self.learning_rate * grads_w[i]
+            self.biases[i] -= self.learning_rate * grads_b[i]
     
     def fit(X, y, epochs=100, loss="binary_crossentropy"):
         ...
