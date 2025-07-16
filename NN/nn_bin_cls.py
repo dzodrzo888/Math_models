@@ -92,12 +92,12 @@ class NN:
         else:
             raise ValueError("Invalid activation function inputed. Supported function: ['softmax', 'relu', 'sigmoid']")
         
-    def _activation_derivative(self, a, kind: str):
+    def _activation_derivative(self, z, kind: str):
         """
         Calculates the derivatives of the activation function
 
         Args:
-            a (float): Activation function result
+            z (float): Activation function result
             kind (str): Type of activation function
 
         Raises:
@@ -107,9 +107,9 @@ class NN:
             float/int: Derivative of the activation
         """
         if kind == "sigmoid":
-            return a * (1 - a)
+            return z * (1 - z)
         elif kind == "relu":
-            return np.where(a > 0, 1, 0)
+            return np.where(z > 0, 1, 0)
         else:
             raise ValueError("Invalid activation function inputed. Supported function: ['relu', 'sigmoid']")
         
@@ -126,6 +126,7 @@ class NN:
         """
         mse = np.mean(np.square(y_true - y_pred))
         return mse
+
     def _MSE_calc(self, y_true: np.array, y_pred: np.array) -> float:
         """
         Calculates mean squared error
@@ -166,6 +167,7 @@ class NN:
             return self._binary_crossentropy_calc(y_true=y_true, y_pred=y_pred)
         else:
             raise ValueError("Invalid loss function inputed. Supported function: ['mean_squared_error', 'binary_crossentropy']")
+
     def _binary_crossentropy_calc(self, y_true: np.array, y_pred: np.array) -> float:
         """
         Calculates binary crossentropy
@@ -186,6 +188,20 @@ class NN:
         return bin_loss_mean
 
     def _compute_loss(self, y_true, y_pred, kind: str):
+        """
+        Computes loss based on a function
+
+        Args:
+            y_true (np.array): Y true value.
+            y_pred (np.array): Y predicted value.
+            kind (str): Kind of loss function
+
+        Raises:
+            ValueError: Raised if invalid activation function kind inputed.
+
+        Returns:
+            np.array: Array of losses
+        """
         if kind == "mean_squared_error":
             return self._MSE_calc(y_true=y_true, y_pred=y_pred)
         elif kind == "binary_crossentropy":
@@ -204,7 +220,7 @@ class NN:
             b (np.array): Bias vector
 
         Returns:
-            A_out(np.array): _description_
+            A_out(np.array): Output activation after applying activation function.
         """
         Z = np.matmul(A_in, W) + b
 
@@ -212,32 +228,43 @@ class NN:
 
         return A_out, Z
 
-    def sequential(self, X: np.array, weights: list[np.array], biases: np.array, activations: list[str]) -> np.array:
+    def _forward_prop(self, X: np.array, activations: list[str]) -> np.array:
         """
-        Sequential func used to calculate the propability
+        Forward propagation func used to calculate the propability
 
         Args:
             X (np.array): Input vector
-            weights (list[np.array]): List of weights
-            biases (np.array): Vector of biases.
             activations (list[str]): List of activation kinds
 
         Returns:
-            A_s(np.array): Activations results
-            Z_s
+            A_s(np.array): Output activation after applying activation function.
+            Z_s(np.array): Linear transformation before activation.
         """
         A = X
         A_s = [A]
         Z_s = []
 
-        for i in range(len(weights)):
-            A, Z = self.dense(A, weights[i], biases[i], kind=activations[i])
+        for i in range(len(self.weights)):
+            A, Z = self.dense(A, self.weights[i], self.biases[i], kind=activations[i])
             A_s.append(A)
             Z_s.append(Z)
 
         return A_s, Z_s 
     
-    def _backward(self, A_s: list, Z_s: list, y_true: np.array, activations: list[str]):
+    def _backward(self, A_s: np.array, Z_s: np.array, y_true: np.array, activations: list[str]):
+        """
+        Function used to compute gradients using the backward propagation
+
+        Args:
+            A_s(np.array): Output activation after applying activation function.
+            Z_s(np.array): Linear transformation before activation.
+            y_true (np.array): Y true value
+            activations (list[str]): Kinds of activations
+
+        Returns:
+            grads_w(list[float]): Gradients of weights.
+            grads_b(list[float]): Gradients of biases.
+        """
         grads_w = []
         grads_b = []
 
@@ -259,8 +286,15 @@ class NN:
 
         return grads_w, grads_b
 
-    def _update_parameters(self, grads_w: np.array, grads_b: np.array):
-        for i in range(self.weights):
+    def _update_parameters(self, grads_w: list[float], grads_b: list[float]):
+        """
+        Updates weights based on the learning rate
+
+        Args:
+            grads_w(list[float]): Gradients of weights.
+            grads_b(list[float]): Gradients of biases.
+        """
+        for i in range(len(self.weights)):
             self.weights[i] -= self.learning_rate * grads_w[i]
             self.biases[i] -= self.learning_rate * grads_b[i]
     
