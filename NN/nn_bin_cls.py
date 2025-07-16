@@ -69,7 +69,7 @@ class NN:
         """
         return np.maximum(0,z)
     
-    def _activation(self, z: np.array, kind: str) -> np.array:
+    def _activation(self, z: np.array, kind="binary_crossentropy") -> np.array:
         """
         Function to apply a activation method
 
@@ -93,7 +93,7 @@ class NN:
         else:
             raise ValueError("Invalid activation function inputed. Supported function: ['softmax', 'relu', 'sigmoid']")
         
-    def _activation_derivative(self, z, kind: str):
+    def _activation_derivative(self, z: float, kind="binary_crossentropy"):
         """
         Calculates the derivatives of the activation function
 
@@ -147,7 +147,7 @@ class NN:
 
         return bin_loss_mean
 
-    def _compute_loss(self, y_true, y_pred, kind: str):
+    def _compute_loss(self, y_true, y_pred, kind="binary_crossentropy"):
         """
         Computes loss based on a function
 
@@ -170,7 +170,7 @@ class NN:
             raise ValueError("Invalid loss function inputed. Supported function: ['mean_squared_error', 'binary_crossentropy']")
         
     
-    def _dense(self, A_in: np.array, W: np.array, b: np.array, kind: str) -> np.array:
+    def _dense(self, A_in: np.array, W: np.array, b: np.array, kind="binary_crossentropy") -> np.array:
         """
         NN layer used to 
 
@@ -188,13 +188,12 @@ class NN:
 
         return A_out, Z
 
-    def _forward_prop(self, X: np.array, activations: list[str]) -> np.array:
+    def _forward_prop(self, X: np.array) -> np.array:
         """
         Forward propagation func used to calculate the propability
 
         Args:
             X (np.array): Input vector
-            activations (list[str]): List of activation kinds
 
         Returns:
             A_s(np.array): Output activation after applying activation function.
@@ -205,13 +204,13 @@ class NN:
         Z_s = []
 
         for i in range(len(self.weights)):
-            A, Z = self._dense(A, self.weights[i], self.biases[i], kind=activations[i])
+            A, Z = self._dense(A, self.weights[i], self.biases[i], kind=self.activations[i])
             A_s.append(A)
             Z_s.append(Z)
 
         return A_s, Z_s 
 
-    def _backward(self, A_s: np.array, Z_s: np.array, y_true: np.array, activations: list[str]):
+    def _backward(self, A_s: np.array, y_true: np.array):
         """
         Function used to compute gradients using the backward propagation
 
@@ -219,7 +218,6 @@ class NN:
             A_s(np.array): Output activation after applying activation function.
             Z_s(np.array): Linear transformation before activation.
             y_true (np.array): Y true value
-            activations (list[str]): Kinds of activations
 
         Returns:
             grads_w(list[float]): Gradients of weights.
@@ -241,7 +239,7 @@ class NN:
 
             if i > 0:
 
-                d_activation = self._activation_derivative(A_s[i], kind=activations[i])
+                d_activation = self._activation_derivative(A_s[i], kind=self.activations[i])
                 delta = np.dot(delta, self.weights[i].T) * d_activation
 
         return grads_w, grads_b
@@ -273,6 +271,8 @@ class NN:
         input_dim = X.shape[1]
         layer_dims = [input_dim] + hidden_layers + [1]
 
+        self.activations = activations
+
         self.weights = []
         self.biases = []
 
@@ -283,19 +283,35 @@ class NN:
             self.biases.append(b)
 
         for epoch in range(self.epochs):
-            A_s, Z_s = self._forward_prop(X, activations)
+            A_s, Z_s = self._forward_prop(X)
             loss_val = self._compute_loss(y, A_s[-1], kind=loss)
-            grads_w, grads_b = self._backward(A_s, Z_s, y, activations)
+            grads_w, grads_b = self._backward(A_s, Z_s, y)
             self._update_parameters(grads_w, grads_b)
 
             if (epoch + 1) % 10 == 0 or epoch == 0:
                 print(f"Epoch {epoch + 1}/{self.epochs} | Loss: {loss_val:.4f}")
 
-    def predict(X, threshold=0.5):
-        ...
+    def predict(self, X, threshold=0.5):
+        """
+        Predicts binary values based on propability
 
-    def predict_proba(X):
-        ...
+        Args:
+            X (_type_): _description_
+            threshold (float, optional): _description_. Defaults to 0.5.
+
+        Returns:
+            _type_: _description_
+        """
+        cls_labels = (self.predict_proba(X) >= threshold).astype(int)
+        
+        return cls_labels
+
+    def predict_proba(self, X):
+        A_s, _ = self._forward_prop(X=X)
+
+        y_hat_prob = A_s[-1]
+
+        return y_hat_prob
 
 if __name__ == "__main__":
     X = np.random.randn(100, 2)
@@ -303,3 +319,4 @@ if __name__ == "__main__":
 
     model = NN(learning_rate=0.001, epochs=100)
     model.fit(X, y, hidden_layers=[4], activations=["relu", "sigmoid"], loss="binary_crossentropy")
+    print(model.predict(X=X))
