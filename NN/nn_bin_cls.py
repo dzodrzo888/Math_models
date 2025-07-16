@@ -285,7 +285,7 @@ class NN:
         for epoch in range(self.epochs):
             A_s, Z_s = self._forward_prop(X)
             loss_val = self._compute_loss(y, A_s[-1], kind=loss)
-            grads_w, grads_b = self._backward(A_s, Z_s, y)
+            grads_w, grads_b = self._backward(A_s, y)
             self._update_parameters(grads_w, grads_b)
 
             if (epoch + 1) % 10 == 0 or epoch == 0:
