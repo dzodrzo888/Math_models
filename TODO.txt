@@ -1,4 +1,7 @@
 []Add L1/L2 regularization
+    -[X]For linreg
+    -[]For logreg
+    -[]For NN
 []Add polynomial manipulation
 []Generalize repeated functions
 []Optimize architecure
