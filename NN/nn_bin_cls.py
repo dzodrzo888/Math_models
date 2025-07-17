@@ -229,7 +229,19 @@ class NN:
 
         return A_s, Z_s 
 
-    def _compute_gradients(self, a_s, delta, index):
+    def _compute_gradients(self, a_s: float, delta: float, index: int):
+        """
+        Computes gradients.
+
+        Args:
+            a_s (float): Current sigmoid activation
+            delta (float): Delta calc
+            index (int): Index
+
+        Returns:
+            dw(float): weights derivative
+            db(float): bias derivative
+        """
         
         m = len(y)
 
@@ -324,22 +336,31 @@ class NN:
             if (epoch + 1) % 10 == 0 or epoch == 0:
                 print(f"Epoch {epoch + 1}/{self.epochs} | Loss: {loss_val:.4f}")
 
-    def predict(self, X, threshold=0.5):
+    def predict(self, X: np.array, threshold=0.5):
         """
         Predicts binary values based on propability
 
         Args:
-            X (_type_): _description_
-            threshold (float, optional): _description_. Defaults to 0.5.
+            X (np.array): Input features.
+            threshold (float, optional): Threshold for bin vals. Defaults to 0.5.
 
         Returns:
-            _type_: _description_
+            cls_labels(np.array): Array of class labels
         """
         cls_labels = (self.predict_proba(X) >= threshold).astype(int)
         
         return cls_labels
 
-    def predict_proba(self, X):
+    def predict_proba(self, X: np.array):
+        """
+        Predict propabilities
+
+        Args:
+            X (np.array): Input features
+
+        Returns:
+            y_hat_prob(np.array): Array of predicted propabilities of the target value.
+        """
         A_s, _ = self._forward_prop(X=X)
 
         y_hat_prob = A_s[-1]
