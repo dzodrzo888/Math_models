@@ -1,0 +1,3 @@
+[]Add L1/L2 regularization
+[]Add polynomial manipulation
+[]Generalize repeated functions
