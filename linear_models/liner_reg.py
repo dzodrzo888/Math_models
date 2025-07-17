@@ -6,12 +6,17 @@ class LinearRegression:
     Class to calculate, fit and meassure accuracy of a lin_reg model.
     """
 
-    def __init__(self, learning_rate=0.01, epochs=1000):
+    def __init__(self, learning_rate=0.01, epochs=1000, ridge=None, lasso=None):
         self.learning_rate = learning_rate
         self.epochs = epochs
         self.weights = None
         self.bias = None
         self.losses = []
+        self.ridge = ridge
+        self.lasso = lasso
+
+        if ridge and lasso:
+            ValueError("Cannot initialize both ridge and lasso")
 
     def _initialize_parameters(self, n_features):
         """
@@ -50,12 +55,18 @@ class LinearRegression:
             y_hat (np.array): Y predicted.
 
         Returns:
-            mse(float): Mean squared error.
+            float: Cost value
         """
         m = len(y)
         # MSE calculation
         mse = np.sum(np.square(y_hat - y)) / m
-        return mse
+
+        if self.ridge:
+            return mse + (self.ridge / (2 * m)) * np.sum(np.square(self.weights))
+        elif self.lasso:
+            return mse + (self.lasso / m) * (np.sum(np.abs(self.weights)))
+        else:
+            return mse
 
     def _compute_gradients(self, X, y, y_hat):
         """
@@ -71,8 +82,17 @@ class LinearRegression:
             db(float): Derivative with respect to b.
         """
         # Calculate derivate values
+
+        m = len(y)
+
         dw = (2/len(y))*np.dot(X.T, (y_hat - y))
         db = (2/len(y))*np.sum(y_hat - y)
+
+        if self.ridge:
+            dw += self.ridge / m * self.weights
+
+        elif self.lasso:
+            dw += self.lasso / m * np.sign(self.weights)
 
         return dw, db
 
@@ -116,7 +136,10 @@ class LinearRegression:
         Returns:
             float: Root mean squared error.
         """
-        return np.sqrt(self._compute_cost(y, y_hat))
+        m = len(y)
+        mse = np.sum(np.square(y_hat - y)) / m
+
+        return np.sqrt(mse)
 
     def r_sqrt_calc(self, y, y_hat):
         """
@@ -149,7 +172,7 @@ if __name__ == '__main__':
     X, y = make_regression(n_samples=1000, n_features=10, noise=10, random_state=42)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    model = LinearRegression()
+    model = LinearRegression(lasso=0.1)
     model.fit(X_train, y_train)
 
     y_pred = model.predict(X_test)
