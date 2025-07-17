@@ -5,13 +5,18 @@ class LogisticRegression:
     """
     Class to calculate, fit and meassure accuracy of a log_reg model.
     """
-    def __init__(self, learning_rate=0.01, epochs=1000):
+    def __init__(self, learning_rate=0.01, epochs=1000, ridge=None, lasso=None):
         # Initialize variables
         self.learning_rate = learning_rate
         self.epochs = epochs
         self.weights = None
         self.bias = None
         self.losses = []
+        self.ridge = ridge
+        self.lasso = lasso
+
+        if ridge and lasso:
+            raise ValueError("Cannot initialize both ridge and lasso")
 
     def _sigmoid(self, z):
         """
@@ -76,6 +81,12 @@ class LogisticRegression:
         dw = (1/m)*np.dot(X.T, error)
         db = (1/m)*np.sum(error)
 
+        if self.ridge:
+            dw += self.ridge / m * self.weights
+
+        elif self.lasso:
+            dw += self.lasso / m * np.sign(self.weights)
+
         return dw, db
 
     def _loss(self, y, y_pred):
@@ -90,6 +101,7 @@ class LogisticRegression:
             cost (float): Cost.
         """
         # Set vars - Add epsilon to prevent -inf
+        m = len(y)
         epsilon = 1e-15
         y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
 
@@ -97,7 +109,12 @@ class LogisticRegression:
         loss = -y*np.log(y_pred)-(1-y)*np.log(1-y_pred)
         cost = np.mean(loss)
 
-        return cost
+        if self.ridge:
+            return cost + (self.ridge / (2 * m)) * np.sum(np.square(self.weights))
+        elif self.lasso:
+            return cost + (self.lasso / m) * (np.sum(np.abs(self.weights)))
+        else:
+            return cost
 
     def fit(self, X, y):
         """
@@ -181,7 +198,7 @@ if __name__ == "__main__":
     X, y = make_classification(n_samples=1000, n_features=10, n_classes=2, random_state=42)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-    model = LogisticRegression(learning_rate=0.1, epochs=1000)
+    model = LogisticRegression(learning_rate=0.1, epochs=1000, ridge=0.1)
     model.fit(X_train, y_train)
 
     y_pred = model.predict(X_test)
