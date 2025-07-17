@@ -4,12 +4,16 @@ class NN:
     """
     This class is used to create a simple neural network.
     """
-    def __init__(self, learning_rate, epochs):
+    def __init__(self, learning_rate, epochs, ridge=None, lasso=None):
         self.learning_rate = learning_rate
         self.epochs = epochs
-
+        self.ridge = ridge
+        self.lasso = lasso
         self.weights = []
         self.biases = []
+
+        if ridge and lasso:
+            raise ValueError("Cannot initialize both ridge and lasso")
 
     def compute_predictions(self, X: np.array, w: float, b: float) -> np.array:
         """
@@ -125,8 +129,15 @@ class NN:
         Returns:
             mse (float): Mean squared error
         """
+        m = len(y)
+
         mse = np.mean(np.square(y_true - y_pred))
-        return mse
+        if self.ridge:
+            return mse + (self.ridge / (2 * m)) * np.sum(np.square(self.weights))
+        elif self.lasso:
+            return mse + (self.lasso / m) * (np.sum(np.abs(self.weights)))
+        else:
+            return mse
     
     def _binary_crossentropy_calc(self, y_true: np.array, y_pred: np.array) -> float:
         """
@@ -139,13 +150,21 @@ class NN:
         Returns:
             bin_loss_mean (float): Binary crossentropy loss value.
         """
+
+        m = len(y)
+
         epsilon = 1e-15
         y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
         bin_loss = y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred)
 
-        bin_loss_mean = -np.mean(bin_loss)
+        cost = -np.mean(bin_loss)
 
-        return bin_loss_mean
+        if self.ridge:
+            return cost + (self.ridge / (2 * m)) * np.sum(np.sum(np.square(w)) for w in self.weights)
+        elif self.lasso:
+            return cost + (self.lasso / m) * np.sum(np.sum(np.abs(w)) for w in self.weights)
+        else:
+            return cost
 
     def _compute_loss(self, y_true, y_pred, kind="binary_crossentropy"):
         """
@@ -210,6 +229,21 @@ class NN:
 
         return A_s, Z_s 
 
+    def _compute_gradients(self, a_s, delta, index):
+        
+        m = len(y)
+
+        dw = np.dot(a_s.T, delta)
+        db = np.sum(delta, axis=0, keepdims=True)
+
+        if self.ridge:
+            dw += self.ridge / m * self.weights[index]
+
+        elif self.lasso:
+            dw += self.lasso / m * np.sign(self.weights[index])
+
+        return dw, db
+    
     def _backward(self, A_s: np.array, y_true: np.array):
         """
         Function used to compute gradients using the backward propagation
@@ -231,8 +265,7 @@ class NN:
 
         for i in reversed(range(len(self.weights))):
 
-            dw = np.dot(A_s[i].T, delta)
-            db = np.sum(delta, axis=0, keepdims=True)
+            dw, db = self._compute_gradients(a_s=A_s[i], delta=delta, index=i)
 
             grads_w.insert(0, dw)
             grads_b.insert(0, db)
@@ -283,7 +316,7 @@ class NN:
             self.biases.append(b)
 
         for epoch in range(self.epochs):
-            A_s, Z_s = self._forward_prop(X)
+            A_s, _ = self._forward_prop(X)
             loss_val = self._compute_loss(y, A_s[-1], kind=loss)
             grads_w, grads_b = self._backward(A_s, y)
             self._update_parameters(grads_w, grads_b)
@@ -317,6 +350,6 @@ if __name__ == "__main__":
     X = np.random.randn(100, 2)
     y = (np.random.rand(100, 1) > 0.5).astype(float)
 
-    model = NN(learning_rate=0.001, epochs=100)
+    model = NN(learning_rate=0.001, epochs=100, lasso=0.1)
     model.fit(X, y, hidden_layers=[4], activations=["relu", "sigmoid"], loss="binary_crossentropy")
     print(model.predict(X=X))
