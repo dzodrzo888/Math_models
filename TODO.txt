@@ -2,3 +2,4 @@
 []Add polynomial manipulation
 []Generalize repeated functions
 []Optimize architecure
+[]Fix backward progation in NN
