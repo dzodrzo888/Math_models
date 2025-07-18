@@ -6,3 +6,4 @@
 []Generalize repeated functions
 []Optimize architecure
 []Fix backward progation in NN
+[]Add Early stopping
