@@ -1,8 +1,9 @@
+"""This module is used to build a binary tree clasifier"""
 import numpy as np
 
 class Tree:
     "This class is used to compute a recursive decisiont tree"
-    
+
     def compute_entropy(self, y):
         """
         Computes entropy
@@ -23,7 +24,7 @@ class Tree:
 
         if p_1 == 0 or p_1 == 1:
             return 0
-        
+
         entropy = -p_1 * np.log2(p_1) - (1 - p_1) * np.log2(1 - p_1)
 
         return entropy
@@ -53,7 +54,7 @@ class Tree:
                 right_branch.append(node_indices[index])
 
         return left_branch, right_branch
-    
+
     def compute_information_gain(self, X: np.array, y: np.array, node_indices: list[int], feature=0):
         """
         Computes information gain
@@ -97,20 +98,43 @@ class Tree:
 
         if len(np.unique(y[node_indices])) == 1:
             return -1
-        
+
         num_features = X.shape[1]
 
         best_feature = -1
         best_info_gain = -1
 
-        for feature in num_features:
+        for feature in range(num_features):
             information_gain = self.compute_information_gain(X, y, node_indices, feature)
 
             if information_gain > best_info_gain:
                 best_info_gain = information_gain
                 best_feature = feature
-        
+
         return best_feature
+
+    def build_tree_recursively(self, X: np.array, y: np.array, node_indices: list[int], max_depth: int, depth=0):
+
+        best_feature = self.find_best_split(X=X, y=y, node_indices=node_indices)
+
+        if depth >= max_depth or np.all(y[node_indices] == y[node_indices][0]) or best_feature == -1:
+
+            values, counts = np.unique(y[node_indices], return_counts=True)
+            majority_class = values[np.argmax(counts)]
+            return {"type": "leaf", "class": majority_class}
+
+        left_indices, right_indices = self.split_dataset(X=X, node_indices=node_indices, feature=best_feature)
+
+        left_subtree = self.build_tree_recursively(X=X, y=y, node_indices=left_indices, max_depth=max_depth, depth=depth+1)
+        right_subtree = self.build_tree_recursively(X=X, y=y, node_indices=right_indices, max_depth=max_depth, depth=depth+1)
+
+        return {
+        "type": "node",
+        "feature": best_feature,
+        "left": left_subtree,
+        "right": right_subtree
+        }
+
 
 if __name__ == "__main__":
     np.random.seed(42)
@@ -119,3 +143,4 @@ if __name__ == "__main__":
     root_indices = list(range(10))
 
     tree_cls = Tree()
+    tree = tree_cls.build_tree_recursively(X_train, y_train, root_indices, 2)
