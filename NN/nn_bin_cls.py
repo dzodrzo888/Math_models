@@ -129,7 +129,7 @@ class NN:
         Returns:
             mse (float): Mean squared error
         """
-        m = len(y)
+        m = len(y_true)
 
         mse = np.mean(np.square(y_true - y_pred))
         if self.ridge:
@@ -151,7 +151,7 @@ class NN:
             bin_loss_mean (float): Binary crossentropy loss value.
         """
 
-        m = len(y)
+        m = len(y_true)
 
         epsilon = 1e-15
         y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
@@ -243,7 +243,7 @@ class NN:
             db(float): bias derivative
         """
         
-        m = len(y)
+        m = len(a_s)
 
         dw = np.dot(a_s.T, delta)
         db = np.sum(delta, axis=0, keepdims=True)

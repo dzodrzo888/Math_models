@@ -2,7 +2,7 @@
 import numpy as np
 
 class Tree:
-    "This class is used to compute a recursive decisiont tree"
+    "This class is used to compute a recursive decisiont tree."
 
     def compute_entropy(self, y):
         """
@@ -20,12 +20,12 @@ class Tree:
 
         entropy = 0.
 
-        p_1 = np.count_nonzero(y == 1) / len(y)
+        positive_prob = np.count_nonzero(y == 1) / len(y)
 
-        if p_1 == 0 or p_1 == 1:
+        if positive_prob in (0, 1):
             return 0
 
-        entropy = -p_1 * np.log2(p_1) - (1 - p_1) * np.log2(1 - p_1)
+        entropy = -positive_prob * np.log2(positive_prob) - (1 - positive_prob) * np.log2(1 - positive_prob)
 
         return entropy
 
@@ -128,11 +128,13 @@ class Tree:
             dict: Tree leaf or node
         """
 
+        current_y_targets = y[node_indices]
+
         best_feature = self.find_best_split(X=X, y=y, node_indices=node_indices)
 
-        if depth >= max_depth or np.all(y[node_indices] == y[node_indices][0]) or best_feature == -1:
+        if depth >= max_depth or np.all(current_y_targets == current_y_targets[0]) or best_feature == -1:
 
-            values, counts = np.unique(y[node_indices], return_counts=True)
+            values, counts = np.unique(current_y_targets, return_counts=True)
             majority_class = values[np.argmax(counts)]
             return {"type": "leaf", "class": majority_class}
 
