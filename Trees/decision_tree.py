@@ -114,6 +114,19 @@ class Tree:
         return best_feature
 
     def build_tree_recursively(self, X: np.array, y: np.array, node_indices: list[int], max_depth: int, depth=0):
+        """
+        Builds tree recursively.
+
+        Args:
+            X (np.array): Input features.
+            y (np.array): Target values.
+            node_indices (list[int]): List of current input values
+            max_depth (int): Maximum allowed depth of a tree.
+            depth (int, optional): Current depth of a tree. Defaults to 0.
+
+        Returns:
+            dict: Tree leaf or node
+        """
 
         best_feature = self.find_best_split(X=X, y=y, node_indices=node_indices)
 
