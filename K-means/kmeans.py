@@ -6,6 +6,13 @@ class Kmeans:
     """
 
     def __init__(self, k: int, max_iter: int):
+
+        if k <= 0:
+            raise ValueError(f"K needs to be positive right now its:  {k}")
+        
+        if max_iter <= 0:
+            raise ValueError(f"Max iter needs to be positive right now its: {max_iter}")
+
         self.k = k
         self.centroids = None
         self.max_iter = max_iter
@@ -49,7 +56,11 @@ class Kmeans:
 
         for i in range(self.k):
             curr_points = X[labels == i]
-            centroids[i] = np.mean(curr_points, axis=0)
+
+            if len(curr_points) < 1:
+                centroids[i] = X[np.random.choice(X.shape[0])] 
+            else:
+                centroids[i] = np.mean(curr_points, axis=0)
     
     def get_centroids(self) -> np.array:
         """
@@ -91,6 +102,9 @@ class Kmeans:
         if self.centroids is None:
             raise ValueError("Model needs to be fitted first!")
         
+        if X.shape[1] != self.centroids[1]:
+            raise ValueError(f"X has a different shape than one used in training. X shape = {X.shape[1]}")
+        
         labels = self._assign_clusters(X=X, centroids=self.centroids)
 
         return labels
@@ -101,3 +115,5 @@ if __name__ == "__main__":
     np.random.seed(42)
     X = np.random.rand(10, 2)
     kmeans_cls = Kmeans(k=3, max_iter=10)
+    kmeans_cls.fit(X)
+    X = np.random.rand(10, 2)

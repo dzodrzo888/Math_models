@@ -8,3 +8,4 @@
 []Fix backward progation in NN
 []Add Early stopping
 []Add continous/numerical feature option to decision_tree
+[]Optimize KMeans
