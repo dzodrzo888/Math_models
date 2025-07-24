@@ -1,11 +1,15 @@
-[X]Add L1/L2 regularization
-    -[X]For linreg
-    -[X]For logreg
-    -[X]For NN
-[]Add polynomial manipulation
-[]Generalize repeated functions
-[]Optimize architecure
-[]Fix backward progation in NN
-[]Add Early stopping
-[]Add continous/numerical feature option to decision_tree
-[]Optimize KMeans
+Func adding
+    -[]Add PCA
+    -[X]Add L1/L2 regularization
+        -[X]For linreg
+        -[X]For logreg
+        -[X]For NN
+    -[]Add polynomial manipulation
+    -[]Add Early stopping
+    -[]Add continous/numerical feature option to decision_tree
+Optimization
+    -[]Generalize repeated functions
+    -[]Optimize architecure
+    -[]Optimize KMeans
+Err fixes:
+    -[]Fix backward progation in NN
