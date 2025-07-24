@@ -11,6 +11,7 @@ class NN:
         self.lasso = lasso
         self.weights = []
         self.biases = []
+        self.activations = None
 
         if ridge and lasso:
             raise ValueError("Cannot initialize both ridge and lasso")
@@ -301,7 +302,7 @@ class NN:
             self.weights[i] -= self.learning_rate * grads_w[i]
             self.biases[i] -= self.learning_rate * grads_b[i]
 
-    def fit(self, X: np.array, y: np.array, hidden_layers=[5], activations=["relu", "sigmoid"], loss="binary_crossentropy"):
+    def fit(self, X: np.array, y: np.array, activations: list[str], hidden_layers: list[int], loss="binary_crossentropy"):
         """
         Fit the neural network model.
 
