@@ -10,10 +10,11 @@ class ColaborativeFiltering:
         self.epochs = epochs
         self.learning_rate = learning_rate
         self.lambda_ = lambda_
+        self.regularization = False
+
         if lambda_:
             self.regularization = True
-        else:
-            self.regularization = False
+            
         self.X = X
         self.W = W
         self.b = b
@@ -33,14 +34,14 @@ class ColaborativeFiltering:
             cost_scalar(float): Cost value
         """
         
-        cost_matrix = R * np.square((np.matmul(X, W.T) + b) - Y) / 2
+        error = R * np.square((np.matmul(X, W.T) + b) - Y) / 2
 
         if self.regularization:
-            cost_scalar = np.sum(cost_matrix) + self.lambda_ / 2 * np.sum(np.square(W)) + self.lambda_ / 2 * np.sum(np.square(X)) 
+            cost = np.sum(error) + self.lambda_ / 2 * np.sum(np.square(W)) + self.lambda_ / 2 * np.sum(np.square(X)) 
         else:
-            cost_scalar = np.sum(cost_matrix)
+            cost = np.sum(error)
 
-        return cost_scalar
+        return cost
     
     def _compute_gradients(self, X: np.ndarray, W:np.ndarray, b: np.ndarray, Y: np.ndarray, R: np.ndarray):
         """
@@ -58,16 +59,13 @@ class ColaborativeFiltering:
         """
 
         error = R * ((np.matmul(X, W.T) + b) - Y)
+        dx = np.matmul(error, W)
+        dw = np.matmul(error.T, X)
         
         if self.regularization:
-            dx = np.matmul(error, W) + self.lambda_*X
+            dx += self.lambda_ * X
 
-            dw = np.matmul(error.T, X) +  self.lambda_*W
-
-        else:
-            dx = np.matmul(error, W)
-
-            dw = np.matmul(error.T, X)
+            dw += self.lambda_ * W
 
         db = np.sum(error, axis=0)
 
