@@ -5,7 +5,7 @@ class ColaborativeFiltering:
     This class is used to perform operations using colaborative filetring.
     """
 
-    def __init__(self, epochs=1000, learning_rate=0.01, lambda_=None):
+    def __init__(self, epochs=1000, learning_rate=0.01, lambda_=None, X=None, W=None, b=None):
 
         self.epochs = epochs
         self.learning_rate = learning_rate
@@ -14,9 +14,9 @@ class ColaborativeFiltering:
             self.regularization = True
         else:
             self.regularization = False
-        self.X = None
-        self.W = None
-        self.b = None
+        self.X = X
+        self.W = W
+        self.b = b
 
     def _compute_cost(self, X: np.ndarray, W:np.ndarray, b: np.ndarray, Y: np.ndarray, R: np.ndarray) -> float:
         """
@@ -103,9 +103,12 @@ class ColaborativeFiltering:
         n_users, n_items = Y.shape
 
         np.random.seed(42)
-        self.X = np.random.rand(n_users, n_features) * 0.01  # Small random values
-        self.W = np.random.rand(n_items, n_features) * 0.01
-        self.b = np.zeros(n_items)
+        if self.X is None:
+            self.X = np.random.rand(n_users, n_features) * 0.01  # Small random values
+        if self.W is None:
+            self.W = np.random.rand(n_items, n_features) * 0.01
+        if self.b is None:
+            self.b = np.zeros(n_items)
 
 
         for epoch in range(self.epochs):
@@ -135,3 +138,8 @@ if __name__ == "__main__":
         [1, 0, 0, 0]])
     col_fil_cls = ColaborativeFiltering(lambda_=1)
     col_fil_cls.fit( Y, R)
+    X = np.random.rand(5, 3)
+    W = np.random.rand(4, 3)
+    b = np.zeros(4)
+    r_hat = col_fil_cls.predict(X, W, b)
+    print(r_hat)
