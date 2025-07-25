@@ -8,10 +8,11 @@ Func adding
     -[]Add Early stopping
     -[]Add continous/numerical feature option to decision_tree
     -[]Add mean_normalization and finding similar items to recommenders
+    -[]Add cold&warm start
 Optimization
     -[]Generalize repeated functions
     -[]Optimize architecure
     -[]Optimize KMeans
-    -[]Content_based filtering is apparently wrong, change it
 Err fixes:
     -[]Fix backward progation in NN
+    -[]Content_based filtering is apparently wrong, change it
