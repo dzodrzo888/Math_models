@@ -16,7 +16,7 @@ class LinearRegression:
         self.lasso = lasso
 
         if ridge and lasso:
-            ValueError("Cannot initialize both ridge and lasso")
+            raise ValueError("Cannot initialize both ridge and lasso")
 
     def _initialize_parameters(self, n_features):
         """
