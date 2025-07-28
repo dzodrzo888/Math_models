@@ -5,11 +5,11 @@ Func adding
         -[X]For logreg
         -[X]For NN
     -[]Add polynomial manipulation
-    -[]Add Early stopping
+    -[X]Add Early stopping
     -[]Add continous/numerical feature option to decision_tree
     -[]Add mean_normalization and finding similar items to recommenders
     -[]Add cold&warm start
-    -[] Implement reinforcment learning wtih state-action (DQL)
+    -[]Implement reinforcment learning wtih state-action (DQL)
 Optimization
     -[]Generalize repeated functions
     -[]Optimize architecure

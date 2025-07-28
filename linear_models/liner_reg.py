@@ -1,5 +1,6 @@
 """This module is used to create LinearRegression class."""
 import numpy as np
+from helpers import early_stopping
 
 class LinearRegression:
     """
@@ -108,6 +109,8 @@ class LinearRegression:
         # Initialize parametrs
         self._initialize_parameters(n_features)
 
+        early_stopping_cls = early_stopping.EarlyStopping(delta=0.001, patience=5, mode='min')
+
         for epoch in range(self.epochs):
             # linear model
             y_hat = self.predict(X)
@@ -115,6 +118,14 @@ class LinearRegression:
             cost = self._compute_cost(y, y_hat)
 
             self.losses.append(cost)
+
+            stop_training = early_stopping_cls.on_epoch_end(curr_epoch_val=cost, weights=self.weights)
+
+            if stop_training:
+                self.weights = early_stopping_cls.get_best_weights()
+                best_cost = early_stopping_cls.get_best_cost_value()
+                print(f"Training stopped, no more improvements {best_cost}")
+                break
 
             dw, db = self._compute_gradients(X, y, y_hat)
 
