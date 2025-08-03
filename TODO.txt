@@ -1,5 +1,5 @@
 Func adding
-    -[]Add PCA
+    -[X]Add PCA
     -[X]Add L1/L2 regularization
         -[X]For linreg
         -[X]For logreg
