@@ -40,11 +40,11 @@ class NN:
             z (np.array): Logit
 
         Returns:
-            a (np.array): 
+            a (np.array): Output activaiton vector
         """
         ez = np.exp(z)
 
-        a = ez/np.sum(ez)
+        a = ez/np.sum(ez, axis=1, keepdims=True)
 
         return a
 
@@ -375,3 +375,4 @@ if __name__ == "__main__":
     model = NN(learning_rate=0.001, epochs=100, lasso=0.1)
     model.fit(X, y, hidden_layers=[4], activations=["relu", "sigmoid"], loss="binary_crossentropy")
     print(model.predict(X=X))
+
