@@ -61,6 +61,21 @@ class NN:
         a = 1/(1 + np.exp(-z))
 
         return a
+
+    def tanh_calc(self, z: np.ndarray) -> np.ndarray:
+         """
+        Function to calculate tanh activation value
+
+        Args:
+            z (np.array): Logit
+        
+        Returns:
+            a: tahn
+        """
+
+        a = (np.exp(z) - np.exp(-z)) / (np.exp(z) + np.exp(-z))
+
+        return a
     
     def relu_calc(self, z: np.array) -> np.array:
         """
@@ -375,4 +390,5 @@ if __name__ == "__main__":
     model = NN(learning_rate=0.001, epochs=100, lasso=0.1)
     model.fit(X, y, hidden_layers=[4], activations=["relu", "sigmoid"], loss="binary_crossentropy")
     print(model.predict(X=X))
+
 
