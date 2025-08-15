@@ -64,19 +64,18 @@ class NN:
 
     def tanh_calc(self, z: np.ndarray) -> np.ndarray:
          """
-        Function to calculate tanh activation value
+         Function to calculate tanh activation value
 
-        Args:
+         Args:
             z (np.array): Logit
         
-        Returns:
+         Returns:
             a: tahn
-        """
+         """
+         a = (np.exp(z) - np.exp(-z)) / (np.exp(z) + np.exp(-z))
 
-        a = (np.exp(z) - np.exp(-z)) / (np.exp(z) + np.exp(-z))
+         return a
 
-        return a
-    
     def relu_calc(self, z: np.array) -> np.array:
         """
         Relu activation calculation

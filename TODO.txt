@@ -14,6 +14,8 @@ Optimization
     -[]Optimize architecure
     -[]Optimize KMeans
     -[]Add functions to PolynomialFeatures
+    -[]Add more weight initialization techniques
+    -[]Refactor and add abstraction to weight initialization
 Err fixes:
     -[]Fix backward progation in NN
     -[]Content_based filtering is apparently wrong, change it
