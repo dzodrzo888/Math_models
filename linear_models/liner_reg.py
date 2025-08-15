@@ -1,25 +1,15 @@
 """This module is used to create LinearRegression class."""
 import numpy as np
 from helpers import early_stopping
+from linear_models.linear_base import LinearBaseModel
 
-class LinearRegression:
+
+class LinearRegression(LinearBaseModel):
     """
     Class to calculate, fit and meassure accuracy of a lin_reg model.
     """
 
-    def __init__(self, learning_rate=0.01, epochs=1000, ridge=None, lasso=None):
-        self.learning_rate = learning_rate
-        self.epochs = epochs
-        self.weights = None
-        self.bias = None
-        self.losses = []
-        self.ridge = ridge
-        self.lasso = lasso
-
-        if ridge and lasso:
-            raise ValueError("Cannot initialize both ridge and lasso")
-
-    def _initialize_parameters(self, n_features):
+    def _initialize_parameters(self, n_features: int):
         """
         Initialize parametrs (weights, bias)
 
@@ -31,25 +21,9 @@ class LinearRegression:
         # Bias initialization
         self.bias = 0.0
 
-    def predict(self, X):
+    def _compute_loss(self, y: np.ndarray, y_hat: np.ndarray) -> float:
         """
-        Predicts y_hat using the lin reg equation
-
-        Args:
-            X (np.array): X
-            w (float): weights
-            b (float): bias
-
-        Returns:
-            np.array: Predicted y value
-        """
-        # Compute predictions
-        y_hat = np.dot(X, self.weights) + self.bias
-        return y_hat
-
-    def _compute_cost(self, y, y_hat):
-        """
-        Compute cost function
+        Compute loss
 
         Args:
             y (np.array): Y actual values.
@@ -64,12 +38,11 @@ class LinearRegression:
 
         if self.ridge:
             return mse + (self.ridge / (2 * m)) * np.sum(np.square(self.weights))
-        elif self.lasso:
+        if self.lasso:
             return mse + (self.lasso / m) * (np.sum(np.abs(self.weights)))
-        else:
-            return mse
+        return mse
 
-    def _compute_gradients(self, X, y, y_hat):
+    def _compute_gradients(self, X: np.ndarray, y: np.ndarray, y_hat: np.ndarray):
         """
         Computes gradients.
 
@@ -97,7 +70,23 @@ class LinearRegression:
 
         return dw, db
 
-    def fit(self, X, y):
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        """
+        Predicts y_hat using the lin reg equation
+
+        Args:
+            X (np.array): X
+            w (float): weights
+            b (float): bias
+
+        Returns:
+            np.array: Predicted y value
+        """
+        # Compute predictions
+        y_hat = np.dot(X, self.weights) + self.bias
+        return y_hat
+
+    def fit(self, X: np.ndarray, y: np.ndarray):
         """
         Trains the linear regression model on inputed data.
 
@@ -115,7 +104,7 @@ class LinearRegression:
             # linear model
             y_hat = self.predict(X)
 
-            cost = self._compute_cost(y, y_hat)
+            cost = self._compute_loss(y, y_hat)
 
             self.losses.append(cost)
 
@@ -136,7 +125,7 @@ class LinearRegression:
             if epoch % 100 == 0:
                 print(f"Epoch {epoch:4}: Cost = {cost:.4f}")
 
-    def rmse_calc(self, y, y_hat):
+    def rmse_calc(self, y: np.ndarray, y_hat: np.ndarray):
         """
         Computes squared mse.
 
@@ -152,7 +141,7 @@ class LinearRegression:
 
         return np.sqrt(mse)
 
-    def r_sqrt_calc(self, y, y_hat):
+    def r_sqrt_calc(self, y: np.ndarray, y_hat: np.ndarray):
         """
         Calcualtes R squared
 

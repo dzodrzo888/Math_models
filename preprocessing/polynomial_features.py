@@ -67,7 +67,7 @@ class PolynomialFeatures:
 
         if not hasattr(self, "combinations") or not hasattr(self, "n_input_features"):
             raise ValueError("Call fit() before transform().")
-        
+
         if X.shape[1] != self.n_input_features:
             raise ValueError(f"Expected {self.n_input_features} features, got {X.shape[1]}.")
 

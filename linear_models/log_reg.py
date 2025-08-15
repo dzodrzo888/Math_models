@@ -1,24 +1,12 @@
 """This module is used to create LogisticRegression class."""
 import numpy as np
+from linear_models.linear_base import LinearBaseModel
 
-class LogisticRegression:
+class LogisticRegression(LinearBaseModel):
     """
     Class to calculate, fit and meassure accuracy of a log_reg model.
     """
-    def __init__(self, learning_rate=0.01, epochs=1000, ridge=None, lasso=None):
-        # Initialize variables
-        self.learning_rate = learning_rate
-        self.epochs = epochs
-        self.weights = None
-        self.bias = None
-        self.losses = []
-        self.ridge = ridge
-        self.lasso = lasso
-
-        if ridge and lasso:
-            raise ValueError("Cannot initialize both ridge and lasso")
-
-    def _sigmoid(self, z):
+    def _sigmoid(self, z: np.ndarray):
         """
         Sigmoid activation function.
 
@@ -33,7 +21,7 @@ class LogisticRegression:
 
         return sigmoid
 
-    def _initialize_parameters(self, n_features):
+    def _initialize_parameters(self, n_features: int):
         """
         Initialize parametrs (weights, bias)
 
@@ -45,7 +33,7 @@ class LogisticRegression:
         # Bias initialization
         self.bias = 0.0
 
-    def _compute_predictions(self, X):
+    def _compute_predictions(self, X: np.ndarray):
         """
         Computes logit predictions.
 
@@ -60,7 +48,7 @@ class LogisticRegression:
 
         return z
 
-    def _compute_gradients(self, X, y, y_pred):
+    def _compute_gradients(self, X: np.ndarray, y: np.ndarray, y_pred: np.ndarray):
         """
         Computes gradients.
 
@@ -89,7 +77,7 @@ class LogisticRegression:
 
         return dw, db
 
-    def _loss(self, y, y_pred):
+    def _compute_loss(self, y: np.ndarray, y_pred: np.ndarray):
         """
         Compute loss.
 
@@ -116,7 +104,7 @@ class LogisticRegression:
         else:
             return cost
 
-    def fit(self, X, y):
+    def fit(self, X: np.ndarray, y: np.ndarray):
         """
         Trains the logistic regression model on inputed data.
 
@@ -141,11 +129,11 @@ class LogisticRegression:
 
             # Print losses
             if i % 100 == 0:
-                loss = self._loss(y, y_hat)
+                loss = self._compute_loss(y, y_hat)
                 self.losses.append(loss)
                 print(f"Iteration {i}, Loss: {loss:.4f}")
 
-    def predict_proba(self, X):
+    def predict_proba(self, X: np.ndarray):
         """
         Predict propabilities
 
@@ -160,7 +148,7 @@ class LogisticRegression:
 
         return y_hat
 
-    def predict(self, X):
+    def predict(self, X: np.ndarray) -> np.ndarray:
         """
         Predict cls labels based on the X input
 
@@ -175,7 +163,7 @@ class LogisticRegression:
         
         return cls_labels
 
-    def accuracy(self, y_true, y_pred):
+    def accuracy(self, y_true: np.ndarray, y_pred: np.ndarray):
         """
         Calculates accuracy of predictions.
 

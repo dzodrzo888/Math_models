@@ -4,7 +4,7 @@ Func adding
         -[X]For linreg
         -[X]For logreg
         -[X]For NN
-    -[]Add polynomial manipulation
+    -[X]Add polynomial manipulation
     -[X]Add Early stopping
     -[]Add continous/numerical feature option to decision_tree
     -[]Add mean_normalization and finding similar items to recommenders
@@ -13,6 +13,7 @@ Optimization
     -[]Generalize repeated functions
     -[]Optimize architecure
     -[]Optimize KMeans
+    -[]Add functions to PolynomialFeatures
 Err fixes:
     -[]Fix backward progation in NN
     -[]Content_based filtering is apparently wrong, change it
