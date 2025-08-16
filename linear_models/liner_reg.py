@@ -9,13 +9,14 @@ class LinearRegression(LinearBaseModel):
     Class to calculate, fit and meassure accuracy of a lin_reg model.
     """
 
-    def _initialize_parameters(self, n_features: int):
+    def _initialize_parameters(self, X: np.ndarray):
         """
         Initialize parametrs (weights, bias)
 
         Args:
-            n_features (int): Number of features
+            X (np.array): X features.
         """
+        _, n_features = X.shape
         # Weights initialization
         self.weights = np.zeros(n_features)
         # Bias initialization
@@ -94,9 +95,9 @@ class LinearRegression(LinearBaseModel):
             X (np.array): X feature.
             y (np.array): Y actual value.
         """
-        _, n_features = X.shape
         # Initialize parametrs
-        self._initialize_parameters(n_features)
+        self._initialize_parameters(X=X)
+        print(self.weights)
 
         early_stopping_cls = early_stopping.EarlyStopping(delta=0.001, patience=5, mode='min')
 
