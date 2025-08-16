@@ -9,6 +9,7 @@ Func adding
     -[]Add continous/numerical feature option to decision_tree
     -[]Add mean_normalization and finding similar items to recommenders
     -[]Add cold&warm start
+    -[]Add He and Xe initialization techniques
 Optimization
     -[]Generalize repeated functions
     -[]Optimize architecure
@@ -16,7 +17,9 @@ Optimization
     -[]Add functions to PolynomialFeatures
     -[]Add more weight initialization techniques
     -[]Refactor and add abstractions to ML alg types
+        -[X]For initializers
     -[]Add factory methods to ML alg types
+        -[X]For initializers
 Err fixes:
     -[]Fix backward progation in NN
     -[]Content_based filtering is apparently wrong, change it
