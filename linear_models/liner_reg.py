@@ -1,26 +1,13 @@
 """This module is used to create LinearRegression class."""
 import numpy as np
 from helpers import early_stopping
-from linear_models.linear_base import LinearBaseModel
+from .linear_base import LinearBaseModel
 
 
 class LinearRegression(LinearBaseModel):
     """
     Class to calculate, fit and meassure accuracy of a lin_reg model.
     """
-
-    def _initialize_parameters(self, X: np.ndarray):
-        """
-        Initialize parametrs (weights, bias)
-
-        Args:
-            X (np.array): X features.
-        """
-        _, n_features = X.shape
-        # Weights initialization
-        self.weights = np.zeros(n_features)
-        # Bias initialization
-        self.bias = 0.0
 
     def _compute_loss(self, y: np.ndarray, y_hat: np.ndarray) -> float:
         """
@@ -96,8 +83,9 @@ class LinearRegression(LinearBaseModel):
             y (np.array): Y actual value.
         """
         # Initialize parametrs
-        self._initialize_parameters(X=X)
-        print(self.weights)
+        self.initializer.initialize_parameters(X=X)
+        self.weights = self.initializer.weights
+        self.bias = self.initializer.bias
 
         early_stopping_cls = early_stopping.EarlyStopping(delta=0.001, patience=5, mode='min')
 

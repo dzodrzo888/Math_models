@@ -21,18 +21,6 @@ class LogisticRegression(LinearBaseModel):
 
         return sigmoid
 
-    def _initialize_parameters(self, n_features: int):
-        """
-        Initialize parametrs (weights, bias)
-
-        Args:
-            n_features (int): Number of features
-        """
-        # Weights initialization
-        self.weights = np.zeros(n_features)
-        # Bias initialization
-        self.bias = 0.0
-
     def _compute_predictions(self, X: np.ndarray):
         """
         Computes logit predictions.
@@ -99,10 +87,9 @@ class LogisticRegression(LinearBaseModel):
 
         if self.ridge:
             return cost + (self.ridge / (2 * m)) * np.sum(np.square(self.weights))
-        elif self.lasso:
+        if self.lasso:
             return cost + (self.lasso / m) * (np.sum(np.abs(self.weights)))
-        else:
-            return cost
+        return cost
 
     def fit(self, X: np.ndarray, y: np.ndarray):
         """
@@ -113,8 +100,9 @@ class LogisticRegression(LinearBaseModel):
             y (np.array): Y actual value.
         """
         # Set vars
-        _, n_features = X.shape
-        self._initialize_parameters(n_features)
+        self.initializer.initialize_parameters(X=X)
+        self.weights = self.initializer.weights
+        self.bias = self.initializer.bias
 
         for i in range(self.epochs):
             # Linear model

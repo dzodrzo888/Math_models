@@ -1,24 +1,33 @@
+"""This module is used to define a abstract linear model cls"""
 from abc import ABC, abstractmethod
 import numpy as np
+from parameter_initializers.get_initializers import get_initializer
 
 class LinearBaseModel(ABC):
 
-    def __init__(self, learning_rate: float = 0.01, epochs: int = 1000, ridge=None, lasso=None):
-        # Initialize variables
+    def __init__(
+            self,
+            learning_rate: float = 0.01,
+            epochs: int = 1000,
+            initializer = "zero",
+            ridge=None,
+            lasso=None
+            ):
+
         self.learning_rate = learning_rate
         self.epochs = epochs
+
+        self.initializer = get_initializer(initializer)
         self.weights = None
         self.bias = None
+
         self.losses = []
+
         self.ridge = ridge
         self.lasso = lasso
 
         if ridge and lasso:
             raise ValueError("Cannot initialize both ridge and lasso")
-
-    @abstractmethod
-    def _initialize_parameters(self, n_features: int):
-        pass
 
     @abstractmethod
     def _compute_gradients(self, X: np.ndarray, y: np.ndarray, y_pred: np.ndarray):
