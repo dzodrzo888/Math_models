@@ -9,7 +9,7 @@ class LinearBaseModel(ABC):
             self,
             learning_rate: float = 0.01,
             epochs: int = 1000,
-            initializer = "zero",
+            initializer: str = "zero",
             ridge=None,
             lasso=None
             ):
