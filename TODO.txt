@@ -10,6 +10,7 @@ Func adding
     -[]Add mean_normalization and finding similar items to recommenders
     -[]Add cold&warm start
     -[]Add He and Xe initialization techniques
+    -[]Add Gradient Checking to NN
 Optimization
     -[]Generalize repeated functions
     -[]Optimize architecure
