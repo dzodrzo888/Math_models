@@ -16,6 +16,7 @@ Func adding
         -[] Stochastic gradient descent
         -[] Mini-batch gradient descent
     -[]Add batch normalization
+    -[]Add softmax
 Optimization
     -[]Generalize repeated functions
     -[]Optimize architecure
