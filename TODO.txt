@@ -17,6 +17,7 @@ Func adding
         -[] Mini-batch gradient descent
     -[]Add batch normalization
     -[]Add softmax
+    -[]Add grid search for hyperparameters
 Optimization
     -[]Generalize repeated functions
     -[]Optimize architecure
