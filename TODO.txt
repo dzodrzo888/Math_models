@@ -15,6 +15,7 @@ Func adding
         -[] Adam
         -[] Stochastic gradient descent
         -[] Mini-batch gradient descent
+    -[]Add batch normalization
 Optimization
     -[]Generalize repeated functions
     -[]Optimize architecure
