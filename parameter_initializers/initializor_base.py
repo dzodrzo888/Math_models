@@ -15,5 +15,5 @@ class InitializerBaseModel(ABC):
         self.bias = 0.0
 
     @abstractmethod
-    def initialize_parameters(self, X: np.ndarray):
+    def initialize_parameters(self, X: np.ndarray, **kwargs):
         pass
