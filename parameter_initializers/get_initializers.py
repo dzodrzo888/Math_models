@@ -1,6 +1,8 @@
 """This module is used to choose a initializer."""
 from .gaussian_initialization import GaussianInitialization
 from .zero_initialization import ZeroInitialization
+from .he_initialization import HeInitialization
+from .xavier_initialization import XavierInitialization
 
 def get_initializer(name: str) -> GaussianInitialization | ZeroInitialization:
     """
@@ -16,7 +18,9 @@ def get_initializer(name: str) -> GaussianInitialization | ZeroInitialization:
 
     initializer_map = {
         "gaussian": GaussianInitialization,
-        "zero": ZeroInitialization
+        "zero": ZeroInitialization,
+        "he": HeInitialization,
+        "xavier": XavierInitialization
     }
 
     if name_lower not in initializer_map:
